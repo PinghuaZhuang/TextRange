@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ES2015",
+    "module": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "importHelpers": true,
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "baseUrl": "./",
+    "strict": true,
+    "resolvePackageJsonExports": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "allowSyntheticDefaultImports": true,
+    "types": [],
+    "outDir": "./es",
+    // "emitDeclarationOnly": true,
+    // "declarationDir": "./types",
+    "declaration": true,
+    "declarationMap": true
+  },
+  "exclude": ["node_modules", "test", "dist"],
+  "include": ["src/index.ts"]
+}

@@ -1,0 +1,39 @@
+{
+  "name": "template-rollup-lib-ts",
+  "version": "0.1.0",
+  "description": "",
+  "keywords": [],
+  "license": "MIT",
+  "author": "",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "es/index.js",
+  "browser": "dist/index.js",
+  "files": [
+    "es",
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc & rollup -c",
+    "dev": "rollup -c -w"
+  },
+  "dependencies": {
+    "core-js": "^3.33.1",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.23.2",
+    "@babel/preset-typescript": "^7.23.2",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.5",
+    "@types/lodash": "^4.14.200",
+    "@types/node": "^20.8.7",
+    "rimraf": "^5.0.5",
+    "rollup": "^4.1.4",
+    "tslib": "^2.6.2",
+    "typescript": "^5.2.2"
+  }
+}
