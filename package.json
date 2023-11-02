@@ -1,5 +1,5 @@
 {
-  "name": "template-rollup-lib-ts",
+  "name": "text-range",
   "version": "0.1.0",
   "description": "",
   "keywords": [],
@@ -19,7 +19,8 @@
   },
   "dependencies": {
     "core-js": "^3.33.1",
-    "lodash": "^4.17.21"
+    "invariant": "^2.2.4",
+    "lodash-es": "^4.17.21"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.23.2",
@@ -29,7 +30,7 @@
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.5",
-    "@types/lodash": "^4.14.200",
+    "@types/invariant": "^2.2.36",
     "@types/node": "^20.8.7",
     "rimraf": "^5.0.5",
     "rollup": "^4.1.4",

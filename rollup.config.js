@@ -3,7 +3,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from '@rollup/plugin-typescript';
 import terser from '@rollup/plugin-terser';
-import _ from 'lodash';
+import _ from 'lodash-es';
 import pkg from './package.json' assert { type: 'json' };
 
 export default [
@@ -18,20 +18,20 @@ export default [
     ],
   },
   // browser-friendly UMD build
+  // {
+  //   input: './es/index.js',
+  //   output: {
+  //     name: _.camelCase(pkg.name),
+  //     file: pkg.browser,
+  //     format: 'umd',
+  //     sourcemap: true,
+  //   },
+  //   plugins: [resolve(), babel(), commonjs()],
+  // },
   {
     input: './es/index.js',
     output: {
-      name: _.camelCase(pkg.name),
-      file: pkg.browser,
-      format: 'umd',
-      sourcemap: true,
-    },
-    plugins: [resolve(), babel(), commonjs()],
-  },
-  {
-    input: './es/index.js',
-    output: {
-      name: _.camelCase(pkg.name),
+      name: _.upperFirst(_.camelCase(pkg.name)),
       file: pkg.browser.replace(/\.js$/, '.min.js'),
       format: 'umd',
     },
