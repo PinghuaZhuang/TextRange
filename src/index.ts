@@ -1,4 +1,5 @@
 import {
+  isTextNode,
   isPlainTextNode,
   nodeRangeIterator,
   getTextNodeRects,
@@ -24,6 +25,11 @@ interface TextRangeOptions {
   container?: Element | Range;
   range?: Range;
   id?: string | number;
+  /**
+   * 是否裁剪开始和结束的文本节点
+   * @default false
+   */
+  splitText?: boolean;
 }
 
 /**
@@ -43,19 +49,30 @@ class TextRange {
   root!: Element;
   range!: Range;
   id!: ID;
+  options!: TextRangeOptions;
 
-  constructor({ container, range, id }: TextRangeOptions = {}) {
+  constructor(options: TextRangeOptions = {}) {
+    const { container, range, id, splitText = false } = options;
+    this.options = options;
     const hasContainer = container instanceof Element;
     this.root = hasContainer ? container : document.body;
-    range =
+    let selection: Selection | null;
+    const _range =
       container instanceof Range
         ? container
-        : range ?? getSelection()?.getRangeAt(0);
-    if (range == null || range.collapsed) {
-      throw new Error('No text selected');
+        : range ??
+          ((selection = getSelection())?.isCollapsed
+            ? undefined
+            : selection!.getRangeAt(0));
+    if (_range == null) {
+      throw new Error('range parameter is reqired.');
     }
-    this.range = range;
+    this.range = _range;
     this.id = id ?? TextRange.generateId();
+    splitText && this.splitText();
+    if (this.isEmpty) {
+      console.warn(`ID: ${this.id}, No text selected.`);
+    }
   }
 
   *[Symbol.iterator]() {
@@ -64,6 +81,10 @@ class TextRange {
 
   get single() {
     return isSingle(this.range);
+  }
+
+  get text() {
+    return this.range.toString();
   }
 
   get textNodes() {
@@ -85,6 +106,7 @@ class TextRange {
    * 获取所有元素的 DOMRect
    */
   get rects() {
+    if (this.isEmpty) return [];
     const rects: DOMRect[] = [];
     const { startContainer, startOffset, endContainer, endOffset } = this.range;
     if (this.single) {
@@ -142,14 +164,47 @@ class TextRange {
   /**
    * 替换文本节点
    */
-  // TODO:
-  replace() {}
+  replace(render: (textNode: Text) => Node | Element) {
+    if (!this.options.splitText) this.splitText();
+    const { textNodes } = this;
+    textNodes.forEach(o => {
+      const parentNode = o.parentNode!;
+      const nextSibling = o.nextSibling;
+      const newNode = render(o);
+      if (nextSibling) {
+        parentNode.insertBefore(newNode, nextSibling);
+      } else {
+        parentNode.appendChild(newNode)
+      }
+    });
+  }
+
+  get isEmpty() {
+    return this.range.collapsed;
+  }
+
+  /**
+   * 裁剪开始节点和结束节点
+   */
+  splitText() {
+    if (this.single) return;
+    const { startContainer, startOffset, endContainer, endOffset } = this.range;
+    if (isTextNode(startContainer)) {
+      startContainer.splitText(startOffset);
+      this.range.setStart(startContainer.nextSibling!, 0);
+    }
+    if (isTextNode(endContainer)) {
+      endContainer.splitText(endOffset);
+    }
+  }
 
   /**
    * 包含改节点 && 改节点是文本节点
    */
   isValidTextNode(node: Node): node is Text {
-    return this.root.contains(node) && isPlainTextNode(node);
+    return (
+      this.range.commonAncestorContainer.contains(node) && isPlainTextNode(node)
+    );
   }
 
   static generateId() {
@@ -178,6 +233,7 @@ class TextRange {
 
   /**
    * 获取指定节点的 path
+   * 用户修改文本后尽可能不影响选中的位置
    */
   static getPath(textNode: Node, root: Element): Path {
     let parentElement = textNode.parentElement!;
