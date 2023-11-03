@@ -48,7 +48,9 @@ export function getTextNodeRects(
   const range = document.createRange();
   range.setStart(node, startOffset);
   range.setEnd(node, endOffset);
-  return Array.from(range.getClientRects());
+  return Array.from(range.getClientRects()).filter(
+    (o) => o.width !== 0 && o.height !== 0,
+  );
 }
 
 /**
@@ -59,7 +61,7 @@ export function getStartAndEndRangeText(range: Range) {
   let startText = '';
   let endText = '';
 
-  if (range.collapsed) {
+  if (isSingle(range)) {
     startText = endText = sliceText(startContainer, startOffset, endOffset);
   } else {
     startText = sliceText(startContainer, startOffset);
@@ -94,4 +96,36 @@ export function* nodeAfterIterator(
   } else if (node.parentNode) {
     yield* nodeAfterIterator(node.parentNode, true);
   }
+}
+
+/**
+ * 获取 Range 内的所有非空文本节点
+ */
+export function* nodeRangeIterator(range: Range) {
+  const { startContainer, endContainer } = range;
+  if (isSingle(range)) {
+    if (isPlainTextNode(startContainer)) {
+      yield startContainer;
+    }
+    return;
+  }
+  const iterator = nodeAfterIterator(startContainer);
+  let nextNode = iterator.next().value; // startContainer
+  while (nextNode && nextNode !== endContainer) {
+    if (isPlainTextNode(nextNode)) {
+      yield nextNode;
+    }
+    nextNode = iterator.next().value;
+  }
+  if (nextNode && isPlainTextNode(nextNode)) {
+    yield nextNode; // endContainer
+  }
+}
+
+/**
+ * 判断选中文本是否只有一个节点
+ */
+export function isSingle(range: Range) {
+  const { startContainer, endContainer } = range;
+  return startContainer === endContainer;
 }

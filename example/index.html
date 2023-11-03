@@ -5,6 +5,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Range Example</title>
+  <style>
+    .hilight {
+      box-sizing: border-box;
+      border: 1px solid black;
+      background-color: red;
+      position: absolute;
+    }
+
+    span {
+      font-size: 20px;
+      color: #F56C6C;
+    }
+
+  </style>
 </head>
 
 <body>
@@ -19,7 +33,7 @@
     </a>
   </h1>
   <p dir="auto">
-    Konva is an HTML5 Canvas JavaScript framework that enables high
+    Konva is an <span>HTML5</span> Canvas JavaScript framework that enables high
     performance animations, transitions, node nesting, layering, filtering,
     caching, event handling for desktop and mobile applications, and much
     more.
@@ -31,7 +45,7 @@
     thousands of shapes. Served hot with a side of awesomeness.
   </p>
   <p dir="auto">
-    This repository began as a GitHub fork of
+    This repository began as a <span>GitHub</span> fork of
     <a href="https://github.com/ericdrowell/KineticJS">ericdrowell/KineticJS</a>.
   </p>
   <ul dir="auto">
@@ -65,6 +79,20 @@
   </div>
 
   <script src="../dist/index.min.js"></script>
+
+  <script>
+    window.renderRects = function (textRange) {
+      textRange.rects.forEach((rect) => {
+        const div = document.createElement('div');
+        div.style.width = `${rect.width}px`;
+        div.style.height = `${rect.height}px`;
+        div.style.left = `${rect.left}px`;
+        div.style.top = `${rect.top}px`;
+        div.classList.add('hilight');
+        document.body.append(div);
+      });
+    }
+  </script>
 </body>
 
 </html>
