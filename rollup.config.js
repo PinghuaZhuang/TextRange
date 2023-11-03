@@ -18,16 +18,16 @@ export default [
     ],
   },
   // browser-friendly UMD build
-  // {
-  //   input: './es/index.js',
-  //   output: {
-  //     name: _.camelCase(pkg.name),
-  //     file: pkg.browser,
-  //     format: 'umd',
-  //     sourcemap: true,
-  //   },
-  //   plugins: [resolve(), babel(), commonjs()],
-  // },
+  {
+    input: './es/index.js',
+    output: {
+      name: _.camelCase(pkg.name),
+      file: pkg.browser,
+      format: 'umd',
+      sourcemap: true,
+    },
+    plugins: [resolve(), babel(), commonjs()],
+  },
   {
     input: './es/index.js',
     output: {
