@@ -4,8 +4,8 @@ import {
   getTextNodeRects,
   isSingle,
   getStartAndEndRangeText,
+  compareBoundaryRects,
 } from './utils';
-// import invariant from 'invariant';
 
 interface RangeNodeData {
   path: Path;
@@ -51,7 +51,6 @@ class TextRange {
       container instanceof Range
         ? container
         : range ?? getSelection()?.getRangeAt(0);
-    // invariant(range, `No text selected`);
     if (range == null || range.collapsed) {
       throw new Error('No text selected');
     }
@@ -100,10 +99,25 @@ class TextRange {
     return rects;
   }
 
-  // TODO: compareBoundaryPoints
+  /**
+   * 水平方向相邻的 DOMRect 合并
+   */
   get mergeRects() {
     const { rects } = this;
-    return [];
+    const mergeRects: DOMRect[] = [];
+    let rect: DOMRect = rects[0];
+    rects.reduce((pre, cur) => {
+      if (compareBoundaryRects(pre, cur)) {
+        rect.width += cur.width;
+        rect.height = Math.max(rect.height, cur.height);
+        rect.y = Math.min(rect.y, cur.y);
+      } else {
+        mergeRects.push(rect);
+        rect = cur;
+      }
+      return pre;
+    }, rect);
+    return mergeRects;
   }
 
   get data(): RangeData {

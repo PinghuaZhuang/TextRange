@@ -18,6 +18,14 @@
       color: #F56C6C;
     }
 
+    #rects {
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      position: fixed;
+      left: 0;
+      top: 0;
+    }
   </style>
 </head>
 
@@ -80,16 +88,19 @@
 
   <script src="../dist/index.min.js"></script>
 
+  <div id="rects"></div>
+
   <script>
+    const rects = document.querySelector('#rects');
     window.renderRects = function (textRange) {
-      textRange.rects.forEach((rect) => {
+      textRange.mergeRects.forEach((rect) => {
         const div = document.createElement('div');
         div.style.width = `${rect.width}px`;
         div.style.height = `${rect.height}px`;
         div.style.left = `${rect.left}px`;
         div.style.top = `${rect.top}px`;
         div.classList.add('hilight');
-        document.body.append(div);
+        rects.append(div);
       });
     }
   </script>

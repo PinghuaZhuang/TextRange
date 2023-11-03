@@ -129,3 +129,14 @@ export function isSingle(range: Range) {
   const { startContainer, endContainer } = range;
   return startContainer === endContainer;
 }
+
+/**
+ * 判断2个DOMRect是否水平方向相邻
+ */
+export function compareBoundaryRects(origin: DOMRect, target: DOMRect) {
+  const nextX = origin.left + origin.width;
+  if (nextX > 0 && nextX === target.left) {
+    return true;
+  }
+  return false;
+}
