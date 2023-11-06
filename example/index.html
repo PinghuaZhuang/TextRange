@@ -13,9 +13,13 @@
       position: absolute;
     }
 
-    span {
+    .strong {
       font-size: 20px;
       color: #F56C6C;
+    }
+
+    .strong i {
+      color: initial;
     }
 
     #rects {
@@ -26,6 +30,11 @@
       left: 0;
       top: 0;
     }
+
+    nrmark {
+      background-color: #ffeb3b;
+    }
+
   </style>
 </head>
 
@@ -41,7 +50,7 @@
     </a>
   </h1>
   <p dir="auto">
-    Konva is an <span>HTML5</span> Canvas JavaScript framework that enables high
+    Konva is an <span class="strong">HTML5</span> Canvas JavaScript framework that enables high
     performance animations, transitions, node nesting, layering, filtering,
     caching, event handling for desktop and mobile applications, and much
     more.
@@ -53,7 +62,7 @@
     thousands of shapes. Served hot with a side of awesomeness.
   </p>
   <p dir="auto">
-    This repository began as a <span>GitHub</span> fork of
+    This repository began as a <span class="strong">GitHub</span> fork of
     <a href="https://github.com/ericdrowell/KineticJS">ericdrowell/KineticJS</a>.
   </p>
   <ul dir="auto">
@@ -75,34 +84,35 @@
   </ul>
 
   <div>
-    1
+    111
+    <span class="strong">222</span>
     <span>333</span>
-    <span>333</span>
-    <span>
-      2
-      <i>1</i>
-      <i>1</i>
-      3
+    <span class="strong">
+      444
+      <i>555</i>
+      <i>666</i>
+      777
     </span>
   </div>
 
-  <script src="../dist/index.min.js"></script>
+  <script type="module" src="./index.js"></script>
 
   <div id="rects"></div>
 
-  <script>
-    const rects = document.querySelector('#rects');
-    window.renderRects = function (textRange) {
-      textRange.mergeRects.forEach((rect) => {
-        const div = document.createElement('div');
-        div.style.width = `${rect.width}px`;
-        div.style.height = `${rect.height}px`;
-        div.style.left = `${rect.left}px`;
-        div.style.top = `${rect.top}px`;
-        div.classList.add('hilight');
-        rects.append(div);
+  <script type="module">
+    import TextRange from './index.js';
+
+    document.addEventListener('mouseup', function (e) {
+      console.log('mouseup', e, getSelection().isCollapsed);
+      if (getSelection().isCollapsed) return;
+      let r = new TextRange();
+      console.log('creatTextRange:', r);
+      r.replace((textNode) => {
+        const nrmark = document.createElement('nrmark');
+        nrmark.appendChild(textNode);
+        return nrmark;
       });
-    }
+    });
   </script>
 </body>
 

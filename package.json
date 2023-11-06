@@ -6,16 +6,16 @@
   "license": "MIT",
   "author": "",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/index.min.js",
   "module": "es/index.js",
-  "browser": "dist/index.js",
+  "browser": "dist/index.min.js",
   "files": [
     "es",
     "dist"
   ],
   "scripts": {
     "build": "tsc & rollup -c",
-    "dev": "rollup -c -w"
+    "dev": "pnpm build & live-server ./example"
   },
   "dependencies": {
     "core-js": "^3.33.1",
@@ -31,6 +31,7 @@
     "@rollup/plugin-typescript": "^11.1.5",
     "@types/invariant": "^2.2.36",
     "@types/node": "^20.8.7",
+    "live-server": "^1.2.2",
     "rimraf": "^5.0.5",
     "rollup": "^4.1.4",
     "tslib": "^2.6.2",
