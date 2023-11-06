@@ -37,7 +37,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install and Build
-        run: pnpm install --no-frozen-lockfile && pnpm build:example
+        run: pnpm install --no-frozen-lockfile
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.5
