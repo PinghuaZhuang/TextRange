@@ -45,7 +45,9 @@ type ID = string | number;
 let id = 0;
 
 class TextRange {
-  // rects: DOMRect[] = [];
+  /**
+   * @default document.body
+   */
   root!: Element;
   range!: Range;
   id!: ID;
@@ -94,7 +96,7 @@ class TextRange {
   }
 
   get trimTextNode() {
-    const textNodes = this.textNodes;
+    const { textNodes } = this;
     textNodes.shift();
     textNodes.pop();
     return textNodes;
@@ -163,6 +165,10 @@ class TextRange {
     };
   }
 
+  get isEmpty() {
+    return this.range.collapsed;
+  }
+
   /**
    * 替换文本节点
    */
@@ -179,10 +185,6 @@ class TextRange {
         parentNode.appendChild(newNode);
       }
     });
-  }
-
-  get isEmpty() {
-    return this.range.collapsed;
   }
 
   /**
