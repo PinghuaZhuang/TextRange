@@ -2,7 +2,13 @@
   "name": "text-range",
   "version": "1.0.0",
   "description": "",
-  "keywords": [],
+  "keywords": [
+    "range"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PinghuaZhuang/TextRange"
+  },
   "license": "MIT",
   "author": "",
   "type": "module",

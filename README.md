@@ -1,8 +1,10 @@
 # TextRange
 
-[![publish](https://github.com/PinghuaZhuang/TextRange/actions/workflows/publish.yml/badge.svg)](https://github.com/PinghuaZhuang/TextRange/actions/workflows/publish.yml) [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/PinghuaZhuang/TextRange/blob/master/LICENSE) [![Commit](https://img.shields.io/github/last-commit/pinghuazhuang/TextRange.svg)](https://github.com/PinghuaZhuang/TextRange/commits/master) [![Verison](https://img.shields.io/npm/v/TextRange.svg)](https://www.npmjs.com/package/TextRange)
+[![publish](https://github.com/PinghuaZhuang/TextRange/actions/workflows/publish.yml/badge.svg)](https://github.com/PinghuaZhuang/TextRange/actions/workflows/publish.yml) [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/PinghuaZhuang/TextRange/blob/master/LICENSE) [![Commit](https://img.shields.io/github/last-commit/pinghuazhuang/TextRange.svg)](https://github.com/PinghuaZhuang/TextRange/commits/master) [![Verison](https://img.shields.io/npm/v/text-range.svg)](https://www.npmjs.com/package/text-range)
 
 管理 [Range](https://developer.mozilla.org/zh-CN/docs/Web/API/Range) 的工具. 支持导入/导出. 可用于页面批注.
+
+![](https://cdn.statically.io/gh/PinghuaZhuang/obsdian-note@images/images/text-range.7izj975w7u40.gif)
 
 ## 安装
 
