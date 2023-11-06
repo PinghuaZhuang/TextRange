@@ -22,7 +22,7 @@ interface RangeData {
 }
 
 interface TextRangeOptions {
-  container?: Element | Range;
+  container?: Element;
   range?: Range;
   id?: string | number;
   /**
@@ -50,20 +50,22 @@ class TextRange {
   range!: Range;
   id!: ID;
   options!: TextRangeOptions;
+  /**
+   * 是否裁剪过文本节点
+   * @default false
+   */
+  split = false;
 
   constructor(options: TextRangeOptions = {}) {
     const { container, range, id, splitText = false } = options;
     this.options = options;
-    const hasContainer = container instanceof Element;
-    this.root = hasContainer ? container : document.body;
+    this.root = container ?? document.body;
     let selection: Selection | null;
     const _range =
-      container instanceof Range
-        ? container
-        : range ??
-          ((selection = getSelection())?.isCollapsed
-            ? undefined
-            : selection!.getRangeAt(0));
+      range ??
+      ((selection = getSelection())?.isCollapsed
+        ? undefined
+        : selection!.getRangeAt(0));
     if (_range == null) {
       throw new Error('range parameter is reqired.');
     }
@@ -167,14 +169,14 @@ class TextRange {
   replace(render: (textNode: Text) => Node | Element) {
     if (!this.options.splitText) this.splitText();
     const { textNodes } = this;
-    textNodes.forEach(o => {
-      const parentNode = o.parentNode!;
-      const nextSibling = o.nextSibling;
+    textNodes.forEach((o) => {
+      const { parentNode, nextSibling } = o;
+      if (parentNode == null) return;
       const newNode = render(o);
       if (nextSibling) {
         parentNode.insertBefore(newNode, nextSibling);
       } else {
-        parentNode.appendChild(newNode)
+        parentNode.appendChild(newNode);
       }
     });
   }
@@ -187,8 +189,15 @@ class TextRange {
    * 裁剪开始节点和结束节点
    */
   splitText() {
-    if (this.single) return;
+    this.split = true;
     const { startContainer, startOffset, endContainer, endOffset } = this.range;
+    if (this.single) {
+      if (isTextNode(startContainer) && startOffset !== endOffset) {
+        startContainer.splitText(startOffset);
+        startContainer.splitText(endOffset);
+      }
+      return;
+    }
     if (isTextNode(startContainer)) {
       startContainer.splitText(startOffset);
       this.range.setStart(startContainer.nextSibling!, 0);
