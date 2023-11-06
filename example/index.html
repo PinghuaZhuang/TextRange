@@ -103,9 +103,8 @@
     import TextRange from './index.js';
 
     document.addEventListener('mouseup', function (e) {
-      console.log('mouseup', e, getSelection().isCollapsed);
       if (getSelection().isCollapsed) return;
-      let r = new TextRange();
+      var r = new TextRange();
       console.log('creatTextRange:', r);
       r.replace((textNode) => {
         const nrmark = document.createElement('nrmark');

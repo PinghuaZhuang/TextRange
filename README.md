@@ -76,6 +76,22 @@ const data: RangeData = r.data;
 TextRange.create(data as RangeData); // => TextRange
 ```
 
+### 高亮选中文本
+
+```ts
+import TextRange from 'text-range';
+
+document.addEventListener('mouseup', function (e) {
+  if (getSelection().isCollapsed) return;
+  const r = new TextRange();
+  r.replace((textNode) => {
+    const nrmark = document.createElement('nrmark');
+    nrmark.appendChild(textNode);
+    return nrmark;
+  });
+});
+```
+
 ## 属性.
 
 + root: Element. /** @default: document.body  */ 计算路径的根元素, 不传默认为 `body`.
