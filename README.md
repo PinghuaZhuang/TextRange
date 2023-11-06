@@ -96,24 +96,24 @@ document.addEventListener('mouseup', function (e) {
 
 + root: Element. /** @default: document.body  */ 计算路径的根元素, 不传默认为 `body`.
 + range: Range. 不传默认取 `getSelection().getRangeAt(0)`.
-+ split: boolean; /** @default: false  */  `Range` 首尾文本节点是否根据索引裁剪. 执行 `replace` 方法时, 会执行. 
-+ single: boolean; `Range` 首尾节点是否是同一个. 
++ split: boolean; /** @default: false  */  `Range` 首尾文本节点是否根据索引裁剪. 执行 `replace` 方法时, 会执行.
++ single: boolean; `Range` 首尾节点是否是同一个.
 + text: string; `Range.toString()`.
-+ textNodes: Text[]; 返回所有的非空文本节点. 
-+ trimTextNode: Text[]; 返回除掉首尾的所有非空文本节点. 
++ textNodes: Text[]; 返回所有的非空文本节点.
++ trimTextNode: Text[]; 返回除掉首尾的所有非空文本节点.
 + rect: DOMRect; `range.getBoundingClientRect()`.
 + rects: DOMRect[]; `range.getClientRects()` 所有元素的非空 DOMRect.
-+ mergeRects: DOMRect[]; 合并 `rects` 使相邻的 `rect` 高度一致. 
-+ data: RangeData; 记录 `range` 的数据. 
-+ isEmpty: boolean; `range` 是否为空. 
++ mergeRects: DOMRect[]; 合并 `rects` 使相邻的 `rect` 高度一致.
++ data: RangeData; 记录 `range` 的数据.
++ isEmpty: boolean; `range` 是否为空.
 
 ## 方法
 
-+ replace: (render: (textNode: Text) => Node | Element) => void; 
-  + 替换文本节点为新的节点. 
-  + 会执行 `splitText` 方法. 
++ replace: (render: (textNode: Text) => Node | Element) => void;
+  + 替换文本节点为新的节点.
+  + 会执行 `splitText` 方法.
 + splitText: () => void;
-  + 根据 `startOffset` `endOffset` 裁剪掉首尾的文本节点. 
+  + 根据 `startOffset` `endOffset` 裁剪掉首尾的文本节点.
 
 ## 静态方法
 
@@ -124,5 +124,4 @@ document.addEventListener('mouseup', function (e) {
 + getPath: (textNode: Node, root: Element) => Path;
   + 生成节点的路径.
 + getNodeByPath(path: number[], root: Element) => void;
-  + 根据路径, 获取对应的节点. 
-
+  + 根据路径, 获取对应的节点.

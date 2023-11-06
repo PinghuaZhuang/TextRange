@@ -6,6 +6,7 @@ import {
   isSingle,
   getStartAndEndRangeText,
   compareBoundaryRects,
+  getRangeFrontierTextNode,
 } from './utils';
 
 interface RangeNodeData {
@@ -16,7 +17,7 @@ interface RangeNodeData {
 
 interface RangeData {
   id: string | number;
-  text: string;
+  // text: string;
   start: RangeNodeData;
   end: RangeNodeData;
 }
@@ -42,8 +43,6 @@ type Path = number[];
 
 type ID = string | number;
 
-let id = 0;
-
 class TextRange {
   /**
    * @default document.body
@@ -57,6 +56,7 @@ class TextRange {
    * @default false
    */
   split = false;
+  data!: RangeData;
 
   constructor(options: TextRangeOptions = {}) {
     const { container, range, id, splitText = false } = options;
@@ -73,6 +73,7 @@ class TextRange {
     }
     this.range = _range;
     this.id = id ?? TextRange.generateId();
+    this.data = this.export();
     splitText && this.splitText();
     if (this.isEmpty) {
       console.warn(`ID: ${this.id}, No text selected.`);
@@ -91,7 +92,7 @@ class TextRange {
     return this.range.toString();
   }
 
-  get textNodes() {
+  get textNodes(): Text[] {
     return [...this];
   }
 
@@ -146,31 +147,41 @@ class TextRange {
     return mergeRects;
   }
 
-  get data(): RangeData {
-    const { startContainer, endContainer, startOffset, endOffset } = this.range;
-    const { start, end } = getStartAndEndRangeText(this.range);
-    return {
-      id: this.id,
-      text: this.range.toString(),
-      start: {
-        path: TextRange.getPath(startContainer, this.root),
-        offset: startOffset,
-        text: start,
-      },
-      end: {
-        path: TextRange.getPath(endContainer, this.root),
-        offset: endOffset,
-        text: end,
-      },
-    };
-  }
-
   get isEmpty() {
     return this.range.collapsed;
   }
 
   /**
+   * 导出数据
+   */
+  export(): RangeData {
+    if (this.split) {
+      throw new Error(`Exporting data must come before cropping.`);
+    }
+    const { startContainer, endContainer, startOffset, endOffset } = this.range;
+    const { start, end } = getStartAndEndRangeText(this.range);
+    const startTextNode = getRangeFrontierTextNode(startContainer, startOffset);
+    const endTextNode = getRangeFrontierTextNode(endContainer, endOffset);
+
+    return {
+      id: this.id,
+      // text: this.range.toString(),
+      start: {
+        path: TextRange.getPath(startTextNode, this.root),
+        offset: startContainer === startTextNode ? startOffset : 0,
+        text: start,
+      },
+      end: {
+        path: TextRange.getPath(endTextNode, this.root),
+        offset: endContainer === endTextNode ? endOffset : 0,
+        text: end,
+      },
+    };
+  }
+
+  /**
    * 替换文本节点
+   * 替换成新的节点后, range会发生变化
    */
   replace(render: (textNode: Text) => Node | Element) {
     if (!this.options.splitText) this.splitText();
@@ -179,6 +190,7 @@ class TextRange {
       const { parentNode, nextSibling } = o;
       if (parentNode == null) return;
       const newNode = render(o);
+      if (newNode == null) return;
       if (nextSibling) {
         parentNode.insertBefore(newNode, nextSibling);
       } else {
@@ -197,31 +209,23 @@ class TextRange {
       if (isTextNode(startContainer) && startOffset !== endOffset) {
         isTextNode(endContainer) && endContainer.splitText(endOffset);
         startContainer.splitText(startOffset);
-        startContainer.nextSibling && this.range.setStart(startContainer.nextSibling, 0);
+        startContainer.nextSibling &&
+          this.range.setStart(startContainer.nextSibling, 0);
       }
       return;
     }
     if (isTextNode(startContainer)) {
       startContainer.splitText(startOffset);
-      console.log('startContainer.nextSibling', startContainer.nextSibling);
-      startContainer.nextSibling && this.range.setStart(startContainer.nextSibling, 0);
+      startContainer.nextSibling &&
+        this.range.setStart(startContainer.nextSibling, 0);
     }
     if (isTextNode(endContainer)) {
       endContainer.splitText(endOffset);
     }
   }
 
-  /**
-   * 包含改节点 && 改节点是文本节点
-   */
-  isValidTextNode(node: Node): node is Text {
-    return (
-      this.range.commonAncestorContainer.contains(node) && isPlainTextNode(node)
-    );
-  }
-
   static generateId() {
-    return id++;
+    return String(new Date().getTime());
   }
 
   /**
@@ -229,7 +233,7 @@ class TextRange {
    */
   static create(config: RangeData, root?: Element): TextRange {
     const range = this.createRange(config, root);
-    return new TextRange({ id, range, container: root });
+    return new TextRange({ id: config.id, range, container: root });
   }
 
   /**
@@ -248,7 +252,7 @@ class TextRange {
    * 获取指定节点的 path
    * 用户修改文本后尽可能不影响选中的位置
    */
-  static getPath(textNode: Node, root: Element): Path {
+  static getPath(textNode: Node, root: Element = document.body): Path {
     let parentElement = textNode.parentElement!;
     const path = [
       0,
@@ -273,7 +277,7 @@ class TextRange {
     }
 
     if (parentElement == null) {
-      throw new Error('The text node must be in the root container.');
+      throw new Error('The node must be within the root node.');
     }
 
     return path;
@@ -282,7 +286,7 @@ class TextRange {
   /**
    * 根据 path 获取指定节点
    */
-  static getNodeByPath(path: number[], root: Element) {
+  static getNodeByPath(path: number[], root: Element = document.body) {
     let node: Node | Element = root;
     path.reduce<typeof node>((_node, index, i) => {
       if (node == null) return node;
@@ -290,6 +294,8 @@ class TextRange {
       const childs = isLast ? _node.childNodes : (_node as Element).children;
       if (childs[index]) {
         node = childs[index];
+      } else {
+        throw new Error('Path error, node not found.');
       }
       return node;
     }, node);

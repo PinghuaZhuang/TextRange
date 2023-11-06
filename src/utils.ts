@@ -102,23 +102,25 @@ export function* nodeAfterIterator(
  * 获取 Range 内的所有非空文本节点
  */
 export function* nodeRangeIterator(range: Range) {
-  const { startContainer, endContainer } = range;
+  const { startContainer, endContainer, startOffset, endOffset } = range;
+  const start = getRangeFrontierTextNode(startContainer, startOffset);
+  const end = getRangeFrontierTextNode(endContainer, endOffset);
   if (isSingle(range)) {
-    if (isPlainTextNode(startContainer)) {
-      yield startContainer;
+    if (isPlainTextNode(start)) {
+      yield start;
     }
     return;
   }
-  const iterator = nodeAfterIterator(startContainer);
-  let nextNode = iterator.next().value; // startContainer
-  while (nextNode && nextNode !== endContainer) {
+  const iterator = nodeAfterIterator(start);
+  let nextNode = iterator.next().value; // start
+  while (nextNode && nextNode !== end) {
     if (isPlainTextNode(nextNode)) {
       yield nextNode;
     }
     nextNode = iterator.next().value;
   }
   if (nextNode && isPlainTextNode(nextNode)) {
-    yield nextNode; // endContainer
+    yield nextNode; // end
   }
 }
 
@@ -139,4 +141,14 @@ export function compareBoundaryRects(origin: DOMRect, target: DOMRect) {
     return true;
   }
   return false;
+}
+
+/**
+ * 节点类型是 Text、Comment 或 CDATASection(xml)之一
+ * HTML中没有 CDATASection
+ */
+export function getRangeFrontierTextNode(target: Text | Node, offset: number): Text | Comment {
+  return isTextNode(target) || target.nodeType === 8
+    ? target as Comment
+    : getRangeFrontierTextNode(target.childNodes[offset], 0);
 }
