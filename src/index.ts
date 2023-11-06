@@ -195,14 +195,16 @@ class TextRange {
     const { startContainer, startOffset, endContainer, endOffset } = this.range;
     if (this.single) {
       if (isTextNode(startContainer) && startOffset !== endOffset) {
+        isTextNode(endContainer) && endContainer.splitText(endOffset);
         startContainer.splitText(startOffset);
-        startContainer.splitText(endOffset);
+        startContainer.nextSibling && this.range.setStart(startContainer.nextSibling, 0);
       }
       return;
     }
     if (isTextNode(startContainer)) {
       startContainer.splitText(startOffset);
-      this.range.setStart(startContainer.nextSibling!, 0);
+      console.log('startContainer.nextSibling', startContainer.nextSibling);
+      startContainer.nextSibling && this.range.setStart(startContainer.nextSibling, 0);
     }
     if (isTextNode(endContainer)) {
       endContainer.splitText(endOffset);
