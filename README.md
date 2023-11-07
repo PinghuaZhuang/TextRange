@@ -103,24 +103,48 @@ nrmark {
 
 ## 属性.
 
-+ root: Element. /** @default: document.body  */ 计算路径的根元素, 不传默认为 `body`.
-+ range: Range. 不传默认取 `getSelection().getRangeAt(0)`.
-+ split: boolean; /** @default: false  */  `Range` 首尾文本节点是否根据索引裁剪. 执行 `replace` 方法时, 会执行. 
-+ single: boolean; `Range` 首尾节点是否是同一个. 
-+ data: RangeData; 记录 `range` 的数据. 
-+ isEmpty: boolean; `range` 是否为空. 
++ root: Element. 
+  + default: document.body
+  + 计算路径的根元素, 不传默认为 `body`.
+
++ range: Range. 
+  + 不传默认取 `getSelection().getRangeAt(0)`.
+
++ split: boolean;
+  + default: false;
+  + 首尾文本节点是否根据索引裁剪. 
+
+
++ single: boolean; 
+  + `range` 首尾节点是否是同一个. 
++ data: RangeData; 
+  + 记录 `range` 的数据. 
++ isEmpty: boolean; 
+  + `range` 是否为空. 
 
 ## 实例方法
 
-+ **rects**: () => DOMRect[]; `range.getClientRects()` 所有元素的非空 DOMRect.
-+ **mergeRects**: () => DOMRect[]; 合并 `rects` 使相邻的 `rect` 高度一致. 
++ **rects**: () => DOMRect[]; 
+  + `range.getClientRects()` 所有元素的非空 DOMRect.
+
++ **mergeRects**: () => DOMRect[]; 
+  + 合并 `rects` 使相邻的 `rect` 高度一致. 
+
 + **replace**: (render: (textNode: Text) => Node | Element) => void; 
   + 替换文本节点为新的节点. 
   + 会执行 `splitText` 方法. 
-+ text: () => string; `Range.toString()`.
-+ textNodes: () => Text[]; 返回所有的非空文本节点. 
-+ trimTextNode: () => Text[]; 返回除掉首尾的所有非空文本节点. 
-+ rect: () => DOMRect; `range.getBoundingClientRect()`.
++ text: () => string; 
+  + `range.toString()`.
+
++ textNodes: () => Text[]; 
+  + 返回所有的非空文本节点. 
+
++ trimTextNode: () => Text[]; 
+  + 返回除掉首尾的所有非空文本节点. 
+
++ rect: () => DOMRect; 
+  + `Range.getBoundingClientRect()`.
+
 + splitText: () => void;
   + 根据 `startOffset` `endOffset` 裁剪掉首尾的文本节点. 
 + export: () => RangeData;
@@ -130,7 +154,7 @@ nrmark {
 
 ## 静态方法
 
-+ create: (config: RangeData, root?: Element) => TextRange;
++ **create**: (config: RangeData, root?: Element) => TextRange;
   + 根据数据创建 `TextRange`.
 + createRange: (config: RangeData, root?: Element) => Range.
   + 根据数据创建 `Range`.
