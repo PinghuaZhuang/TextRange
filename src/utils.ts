@@ -5,11 +5,19 @@ export function isTextNode(node: Node): node is Text {
   return node.nodeType === 3;
 }
 
+export function isCommentNode(node: Node): node is Comment {
+  return node.nodeType === 8;
+}
+
+export function isPlainNode(node: Node) {
+  return isTextNode(node) || isCommentNode(node);
+}
+
 /**
  * 判断是否是非空文本节点
  */
 export function isPlainTextNode(node: Node): node is Text {
-  return node.nodeType === 3 && !!(node as Text).wholeText.length;
+  return isTextNode(node) && !!(node as Text).textContent?.length;
 }
 
 /**
@@ -135,20 +143,21 @@ export function isSingle(range: Range) {
 /**
  * 判断2个DOMRect是否水平方向相邻
  */
-export function compareBoundaryRects(origin: DOMRect, target: DOMRect) {
-  const nextX = origin.left + origin.width;
-  if (nextX > 0 && nextX === target.left) {
-    return true;
-  }
-  return false;
+export function compareBoundaryRects(left: DOMRect, right: DOMRect) {
+  return left.right === right.left;
 }
 
 /**
+ * 获取开始和结束的文本节点
  * 节点类型是 Text、Comment 或 CDATASection(xml)之一
  * HTML中没有 CDATASection
+ * @param target range.startContainer || range.endContainer
  */
-export function getRangeFrontierTextNode(target: Text | Node, offset: number): Text | Comment {
-  return isTextNode(target) || target.nodeType === 8
-    ? target as Comment
+export function getRangeFrontierTextNode(
+  target: Text | Node,
+  offset: number,
+): Text | Comment {
+  return isTextNode(target) || isCommentNode(target)
+    ? (target as Comment)
     : getRangeFrontierTextNode(target.childNodes[offset], 0);
 }

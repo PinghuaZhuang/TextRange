@@ -4,11 +4,15 @@
 function isTextNode(node) {
     return node.nodeType === 3;
 }
+function isCommentNode(node) {
+    return node.nodeType === 8;
+}
 /**
  * 判断是否是非空文本节点
  */
 function isPlainTextNode(node) {
-    return node.nodeType === 3 && !!node.wholeText.length;
+    var _a;
+    return isTextNode(node) && !!((_a = node.textContent) === null || _a === void 0 ? void 0 : _a.length);
 }
 /**
  * 获取节点的区间内所有元素的 DOMRect
@@ -99,19 +103,17 @@ function isSingle(range) {
 /**
  * 判断2个DOMRect是否水平方向相邻
  */
-function compareBoundaryRects(origin, target) {
-    const nextX = origin.left + origin.width;
-    if (nextX > 0 && nextX === target.left) {
-        return true;
-    }
-    return false;
+function compareBoundaryRects(left, right) {
+    return left.right === right.left;
 }
 /**
+ * 获取开始和结束的文本节点
  * 节点类型是 Text、Comment 或 CDATASection(xml)之一
  * HTML中没有 CDATASection
+ * @param target range.startContainer || range.endContainer
  */
 function getRangeFrontierTextNode(target, offset) {
-    return isTextNode(target) || target.nodeType === 8
+    return isTextNode(target) || isCommentNode(target)
         ? target
         : getRangeFrontierTextNode(target.childNodes[offset], 0);
 }
@@ -148,63 +150,84 @@ class TextRange {
     get single() {
         return isSingle(this.range);
     }
-    get text() {
+    text() {
         return this.range.toString();
     }
-    get textNodes() {
+    textNodes() {
         return [...this];
     }
-    get trimTextNode() {
-        const { textNodes } = this;
+    trimTextNodes() {
+        const textNodes = this.textNodes();
         textNodes.shift();
         textNodes.pop();
         return textNodes;
     }
-    get rect() {
+    get isEmpty() {
+        return this.range.collapsed;
+    }
+    rect() {
         return this.range.getBoundingClientRect();
     }
     /**
      * 获取所有元素的 DOMRect
      */
-    get rects() {
+    rects() {
         if (this.isEmpty)
             return [];
         const rects = [];
-        const { startContainer, startOffset, endContainer, endOffset } = this.range;
+        const [startTextNode, startOffset] = this.getStart();
+        const [endTextNode, endOffset] = this.getEnd();
+        const trimTextNodes = this.trimTextNodes();
         if (this.single) {
-            rects.push(...getTextNodeRects(startContainer, startOffset, endOffset));
+            rects.push(...getTextNodeRects(startTextNode, startOffset, endOffset));
             return rects;
         }
-        rects.push(...getTextNodeRects(startContainer, startOffset));
-        for (const textNode of this.trimTextNode) {
+        rects.push(...getTextNodeRects(startTextNode, startOffset));
+        for (const textNode of trimTextNodes) {
             rects.push(...getTextNodeRects(textNode));
         }
-        rects.push(...getTextNodeRects(endContainer, 0, endOffset));
+        rects.push(...getTextNodeRects(endTextNode, 0, endOffset));
         return rects;
     }
     /**
      * 水平方向相邻的 DOMRect 合并
      */
-    get mergeRects() {
-        const { rects } = this;
-        const mergeRects = [];
+    mergeRects() {
+        const rects = this.rects();
+        if (!rects.length)
+            return [];
         let rect = rects[0];
+        const mergeRects = [rect];
         rects.reduce((pre, cur) => {
             if (compareBoundaryRects(pre, cur)) {
-                rect.width += cur.width;
-                rect.height = Math.max(rect.height, cur.height);
-                rect.y = Math.min(rect.y, cur.y);
+                pre.width += cur.width;
+                pre.height = Math.max(pre.height, cur.height);
+                pre.y = Math.min(pre.y, cur.y);
+                return pre;
             }
-            else {
-                mergeRects.push(rect);
-                rect = cur;
-            }
-            return pre;
+            mergeRects.push(cur);
+            return cur;
         }, rect);
         return mergeRects;
     }
-    get isEmpty() {
-        return this.range.collapsed;
+    getStart() {
+        const { startContainer, startOffset } = this.range;
+        const node = getRangeFrontierTextNode(startContainer, startOffset);
+        const changed = this.split || startContainer !== node;
+        if (changed) {
+            this.range.setStart(node, 0);
+        }
+        return [node, startContainer !== node ? 0 : startOffset];
+    }
+    getEnd() {
+        const { endContainer, endOffset } = this.range;
+        const node = getRangeFrontierTextNode(endContainer, endOffset);
+        const changed = this.split || endContainer !== node;
+        let offset = isPlainTextNode(node) ? node.textContent.length : 0;
+        if (changed) {
+            this.range.setEnd(node, offset);
+        }
+        return [node, changed ? offset : endOffset];
     }
     /**
      * 导出数据
@@ -213,21 +236,19 @@ class TextRange {
         if (this.split) {
             throw new Error(`Exporting data must come before cropping.`);
         }
-        const { startContainer, endContainer, startOffset, endOffset } = this.range;
         const { start, end } = getStartAndEndRangeText(this.range);
-        const startTextNode = getRangeFrontierTextNode(startContainer, startOffset);
-        const endTextNode = getRangeFrontierTextNode(endContainer, endOffset);
+        const [startTextNode, startOffset] = this.getStart();
+        const [endTextNode, endOffset] = this.getEnd();
         return {
             id: this.id,
-            // text: this.range.toString(),
             start: {
                 path: TextRange.getPath(startTextNode, this.root),
-                offset: startContainer === startTextNode ? startOffset : 0,
+                offset: startOffset,
                 text: start,
             },
             end: {
                 path: TextRange.getPath(endTextNode, this.root),
-                offset: endContainer === endTextNode ? endOffset : 0,
+                offset: endOffset,
                 text: end,
             },
         };
@@ -239,7 +260,7 @@ class TextRange {
     replace(render) {
         if (!this.options.splitText)
             this.splitText();
-        const { textNodes } = this;
+        const textNodes = this.textNodes();
         textNodes.forEach((o) => {
             const { parentNode, nextSibling } = o;
             if (parentNode == null)
@@ -254,6 +275,8 @@ class TextRange {
                 parentNode.appendChild(newNode);
             }
         });
+        this.getStart();
+        this.getEnd();
     }
     /**
      * 裁剪开始节点和结束节点

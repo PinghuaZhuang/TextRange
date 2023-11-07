@@ -1,12 +1,13 @@
 import {
   isTextNode,
-  isPlainTextNode,
+  isPlainNode,
   nodeRangeIterator,
   getTextNodeRects,
   isSingle,
   getStartAndEndRangeText,
   compareBoundaryRects,
   getRangeFrontierTextNode,
+  isPlainTextNode,
 } from './utils';
 
 interface RangeNodeData {
@@ -17,7 +18,6 @@ interface RangeNodeData {
 
 interface RangeData {
   id: string | number;
-  // text: string;
   start: RangeNodeData;
   end: RangeNodeData;
 }
@@ -35,6 +35,7 @@ interface TextRangeOptions {
 
 /**
  * 距离根元素的距离
+ * path 最后数值代表 Node 的索引, 其他则是元素 Element 的索引.
  * @example body > div(0) + div(1) > span > text(0) + text(1)
  *  对于 text(2) 的path为 [1, 0, 1]
  *  [(body > div + div), (div(1) > span), (span > text(0) + text(1))]
@@ -88,67 +89,93 @@ class TextRange {
     return isSingle(this.range);
   }
 
-  get text() {
+  text() {
     return this.range.toString();
   }
 
-  get textNodes(): Text[] {
+  textNodes(): Text[] {
     return [...this];
   }
 
-  get trimTextNode() {
-    const { textNodes } = this;
+  trimTextNodes() {
+    const textNodes = this.textNodes();
     textNodes.shift();
     textNodes.pop();
     return textNodes;
   }
 
-  get rect() {
+  get isEmpty() {
+    return this.range.collapsed;
+  }
+
+  rect() {
     return this.range.getBoundingClientRect();
   }
 
   /**
    * 获取所有元素的 DOMRect
    */
-  get rects() {
+  rects() {
     if (this.isEmpty) return [];
     const rects: DOMRect[] = [];
-    const { startContainer, startOffset, endContainer, endOffset } = this.range;
+    const [startTextNode, startOffset] = this.getStart();
+    const [endTextNode, endOffset] = this.getEnd();
+    const trimTextNodes = this.trimTextNodes();
     if (this.single) {
-      rects.push(...getTextNodeRects(startContainer, startOffset, endOffset));
+      rects.push(...getTextNodeRects(startTextNode, startOffset, endOffset));
       return rects;
     }
-    rects.push(...getTextNodeRects(startContainer, startOffset));
-    for (const textNode of this.trimTextNode) {
+    rects.push(...getTextNodeRects(startTextNode, startOffset));
+    for (const textNode of trimTextNodes) {
       rects.push(...getTextNodeRects(textNode));
     }
-    rects.push(...getTextNodeRects(endContainer, 0, endOffset));
+    rects.push(...getTextNodeRects(endTextNode, 0, endOffset));
     return rects;
   }
 
   /**
    * 水平方向相邻的 DOMRect 合并
    */
-  get mergeRects() {
-    const { rects } = this;
-    const mergeRects: DOMRect[] = [];
-    let rect: DOMRect = rects[0];
+  mergeRects() {
+    const rects = this.rects();
+    if (!rects.length) return [];
+    let rect = rects[0];
+    const mergeRects = [rect];
     rects.reduce((pre, cur) => {
       if (compareBoundaryRects(pre, cur)) {
-        rect.width += cur.width;
-        rect.height = Math.max(rect.height, cur.height);
-        rect.y = Math.min(rect.y, cur.y);
-      } else {
-        mergeRects.push(rect);
-        rect = cur;
+        pre.width += cur.width;
+        pre.height = Math.max(pre.height, cur.height);
+        pre.y = Math.min(pre.y, cur.y);
+        return pre;
       }
-      return pre;
+      mergeRects.push(cur);
+      return cur;
     }, rect);
     return mergeRects;
   }
 
-  get isEmpty() {
-    return this.range.collapsed;
+  getStart() {
+    const { startContainer, startOffset } = this.range;
+    const node = getRangeFrontierTextNode(startContainer, startOffset);
+    const changed = this.split || startContainer !== node;
+    if (changed) {
+      this.range.setStart(node, 0);
+    }
+    return [node, startContainer !== node ? 0 : startOffset] as [
+      Node | Comment,
+      number,
+    ];
+  }
+
+  getEnd() {
+    const { endContainer, endOffset } = this.range;
+    const node = getRangeFrontierTextNode(endContainer, endOffset);
+    const changed = this.split || endContainer !== node;
+    let offset = isPlainTextNode(node) ? node.textContent!.length : 0;
+    if (changed) {
+      this.range.setEnd(node, offset);
+    }
+    return [node, changed ? offset : endOffset] as [Node | Comment, number];
   }
 
   /**
@@ -158,22 +185,20 @@ class TextRange {
     if (this.split) {
       throw new Error(`Exporting data must come before cropping.`);
     }
-    const { startContainer, endContainer, startOffset, endOffset } = this.range;
     const { start, end } = getStartAndEndRangeText(this.range);
-    const startTextNode = getRangeFrontierTextNode(startContainer, startOffset);
-    const endTextNode = getRangeFrontierTextNode(endContainer, endOffset);
+    const [startTextNode, startOffset] = this.getStart();
+    const [endTextNode, endOffset] = this.getEnd();
 
     return {
       id: this.id,
-      // text: this.range.toString(),
       start: {
         path: TextRange.getPath(startTextNode, this.root),
-        offset: startContainer === startTextNode ? startOffset : 0,
+        offset: startOffset,
         text: start,
       },
       end: {
         path: TextRange.getPath(endTextNode, this.root),
-        offset: endContainer === endTextNode ? endOffset : 0,
+        offset: endOffset,
         text: end,
       },
     };
@@ -185,7 +210,7 @@ class TextRange {
    */
   replace(render: (textNode: Text) => Node | Element) {
     if (!this.options.splitText) this.splitText();
-    const { textNodes } = this;
+    const textNodes = this.textNodes();
     textNodes.forEach((o) => {
       const { parentNode, nextSibling } = o;
       if (parentNode == null) return;
@@ -197,6 +222,9 @@ class TextRange {
         parentNode.appendChild(newNode);
       }
     });
+
+    this.getStart();
+    this.getEnd();
   }
 
   /**
