@@ -140,7 +140,7 @@ class TextRange {
     const rects = this.rects();
     if (!rects.length) return [];
     let rect = rects[0];
-    const mergeRects = [rect];
+    const mergeRects: DOMRect[] = [rect];
     rects.reduce((pre, cur) => {
       if (compareBoundaryRects(pre, cur)) {
         pre.width += cur.width;
@@ -150,7 +150,7 @@ class TextRange {
       }
       mergeRects.push(cur);
       return cur;
-    }, rect);
+    });
     return mergeRects;
   }
 
