@@ -19,7 +19,7 @@ export default [
   },
   {
     input: 'es/index.js',
-    output: { file: './example/index.js', format: 'es' },
+    output: { file: './example/lib.js', format: 'es' },
   },
   // browser-friendly UMD build
   {

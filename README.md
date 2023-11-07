@@ -4,7 +4,7 @@
 
 管理 [Range](https://developer.mozilla.org/zh-CN/docs/Web/API/Range) 的工具. 支持导入/导出. 可用于页面批注.
 
-![](https://cdn.statically.io/gh/PinghuaZhuang/obsdian-note@images/images/text-range.7izj975w7u40.gif)
+![](https://cdn.statically.io/gh/PinghuaZhuang/obsdian-note@images/images/text-range.4np8env302i.gif)
 
 ## 安装
 
