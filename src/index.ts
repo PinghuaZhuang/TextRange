@@ -183,7 +183,7 @@ class TextRange {
    */
   export(): RangeData {
     if (this.split) {
-      throw new Error(`Exporting data must come before cropping.`);
+      console.warn(`Exporting data must come before cropping.`);
     }
     const { start, end } = getStartAndEndRangeText(this.range);
     const [startTextNode, startOffset] = this.getStart();
@@ -223,6 +223,14 @@ class TextRange {
       }
     });
 
+    this.update();
+  }
+
+  /**
+   * 更新 range
+   * 替换节点后会导致 range 发生变化(range.collapsed === true)
+   */
+  update() {
     this.getStart();
     this.getEnd();
   }

@@ -112,15 +112,15 @@ nrmark {
 
 ## 实例方法
 
++ **rects**: () => DOMRect[]; `range.getClientRects()` 所有元素的非空 DOMRect.
++ **mergeRects**: () => DOMRect[]; 合并 `rects` 使相邻的 `rect` 高度一致. 
++ **replace**: (render: (textNode: Text) => Node | Element) => void; 
+  + 替换文本节点为新的节点. 
+  + 会执行 `splitText` 方法. 
 + text: () => string; `Range.toString()`.
 + textNodes: () => Text[]; 返回所有的非空文本节点. 
 + trimTextNode: () => Text[]; 返回除掉首尾的所有非空文本节点. 
 + rect: () => DOMRect; `range.getBoundingClientRect()`.
-+ rects: () => DOMRect[]; `range.getClientRects()` 所有元素的非空 DOMRect.
-+ mergeRects: () => DOMRect[]; 合并 `rects` 使相邻的 `rect` 高度一致. 
-+ replace: (render: (textNode: Text) => Node | Element) => void; 
-  + 替换文本节点为新的节点. 
-  + 会执行 `splitText` 方法. 
 + splitText: () => void;
   + 根据 `startOffset` `endOffset` 裁剪掉首尾的文本节点. 
 + export: () => RangeData;
