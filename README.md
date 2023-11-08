@@ -151,6 +151,9 @@ nrmark {
 + export: () => RangeData;
   + 导出数据.
   + ⚠️ 裁剪文本节点(splitText)后, 导出的数据是没办法还原的.
++ update:() => void;
+  + 更新 `range`.
+
 
 
 ## 静态方法

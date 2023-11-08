@@ -1,6 +1,5 @@
 import {
   isTextNode,
-  isPlainNode,
   nodeRangeIterator,
   getTextNodeRects,
   isSingle,

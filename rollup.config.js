@@ -26,7 +26,7 @@ export default [
     input: './es/index.js',
     output: {
       name: _.camelCase(pkg.name),
-      file: pkg.browser,
+      file: pkg.browser.replace(/\.min.js$/, '.js'),
       format: 'umd',
       sourcemap: true,
     },
@@ -36,7 +36,7 @@ export default [
     input: './es/index.js',
     output: {
       name: _.upperFirst(_.camelCase(pkg.name)),
-      file: pkg.browser.replace(/\.js$/, '.min.js'),
+      file: pkg.browser,
       format: 'umd',
     },
     plugins: [resolve(), babel(), commonjs(), terser()],
