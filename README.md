@@ -91,6 +91,7 @@ document.addEventListener('mouseup', function (e) {
     nrmark.appendChild(textNode);
     return nrmark;
   });
+  getSelection().collapseToStart();
 });
 ```
 
@@ -101,55 +102,55 @@ nrmark {
 }
 ```
 
-## 属性.
+## 属性
 
-+ root: Element. 
++ root: Element.
   + default: document.body
   + 计算路径的根元素, 不传默认为 `body`.
 
-+ range: Range. 
++ range: Range.
   + 不传默认取 `getSelection().getRangeAt(0)`.
 
 + split: boolean;
   + default: false;
-  + 首尾文本节点是否根据索引裁剪. 
+  + 首尾文本节点是否根据索引裁剪.
 
 
-+ single: boolean; 
-  + `range` 首尾节点是否是同一个. 
-+ data: RangeData; 
-  + 记录 `range` 的数据. 
-+ isEmpty: boolean; 
-  + `range` 是否为空. 
++ single: boolean;
+  + `range` 首尾节点是否是同一个.
++ data: RangeData;
+  + 记录 `range` 的数据.
++ isEmpty: boolean;
+  + `range` 是否为空.
 
 ## 实例方法
 
-+ **rects**: () => DOMRect[]; 
++ **rects**: () => DOMRect[];
   + `range.getClientRects()` 所有元素的非空 DOMRect.
 
-+ **mergeRects**: () => DOMRect[]; 
-  + 合并 `rects` 使相邻的 `rect` 高度一致. 
++ **mergeRects**: () => DOMRect[];
+  + 合并 `rects` 使相邻的 `rect` 高度一致.
 
-+ **replace**: (render: (textNode: Text) => Node | Element) => void; 
-  + 替换文本节点为新的节点. 
-  + 会执行 `splitText` 方法. 
-+ text: () => string; 
++ **replace**: (render: (textNode: Text) => Node | Element) => void;
+  + 替换文本节点为新的节点.
+  + 会执行 `splitText` 方法.
++ text: () => string;
   + `range.toString()`.
 
-+ textNodes: () => Text[]; 
-  + 返回所有的非空文本节点. 
++ textNodes: () => Text[];
+  + 返回所有的非空文本节点.
 
-+ trimTextNode: () => Text[]; 
-  + 返回除掉首尾的所有非空文本节点. 
++ trimTextNode: () => Text[];
+  + 返回除掉首尾的所有非空文本节点.
 
-+ rect: () => DOMRect; 
++ rect: () => DOMRect;
   + `Range.getBoundingClientRect()`.
 
 + splitText: () => void;
-  + 根据 `startOffset` `endOffset` 裁剪掉首尾的文本节点. 
+  + 根据 `startOffset` `endOffset` 裁剪掉首尾的文本节点.
 + export: () => RangeData;
   + 导出数据.
-  + ⚠️ 裁剪文本节点(splitText)后, 导出的数据是没办法还原的. 
+  + ⚠️ 裁剪文本节点(splitText)后, 导出的数据是没办法还原的.
 
 
 ## 静态方法
@@ -161,5 +162,4 @@ nrmark {
 + getPath: (textNode: Node, root: Element) => Path;
   + 生成节点的路径.
 + getNodeByPath(path: number[], root: Element) => void;
-  + 根据路径, 获取对应的节点. 
-
+  + 根据路径, 获取对应的节点.
