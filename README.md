@@ -134,6 +134,10 @@ nrmark {
 + **replace**: (render: (textNode: Text) => Node | Element) => void;
   + 替换文本节点为新的节点.
   + 会执行 `splitText` 方法.
++ isPointInRange: (point: { x: number; y: number; }, expand?: number | [number, number]) => boolean;
+  + 判断坐标是否在 `Range` 内.
+  + expand: `DOMRect` 扩展区域. 默认值: 0.
+
 + text: () => string;
   + `range.toString()`.
 
