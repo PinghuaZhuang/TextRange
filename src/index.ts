@@ -259,6 +259,29 @@ class TextRange {
     }
   }
 
+  isPointInRange(
+    point: { x: number; y: number },
+    expand: [number, number] | number = 0,
+  ) {
+    let expandX: number;
+    let expandY: number;
+    if (typeof expand === 'number') {
+      expandX = expandY = expand;
+    } else {
+      [expandX, expandY] = expand;
+    }
+
+    const mergeRects = this.mergeRects();
+    let result = false;
+    mergeRects.forEach((rect) => {
+      if (rect.x - expandX > point.x || rect.y - expandY > point.y) return;
+      if (rect.right + expandX < point.x || rect.bottom + expandY < point.y)
+        return;
+      result = true;
+    });
+    return result;
+  }
+
   static generateId() {
     return String(new Date().getTime());
   }
