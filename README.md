@@ -134,9 +134,13 @@ nrmark {
 + **replace**: (render: (textNode: Text) => Node | Element) => void;
   + 替换文本节点为新的节点.
   + 会执行 `splitText` 方法.
-+ isPointInRange: (point: { x: number; y: number; }, expand?: number | [number, number]) => boolean;
++ **isPointInRange**: (point: { x: number; y: number; }, expand?: number | [number, number]) => boolean;
   + 判断坐标是否在 `Range` 内.
   + expand: `DOMRect` 扩展区域. 默认值: 0.
+
++ **isIntersecting**: (threshold?: number) => boolean;
+  + 判断 `range` 是否在可视区域内.
+  + threshold: 目标元素与视窗重叠的阈值（0~1）
 
 + text: () => string;
   + `range.toString()`.
