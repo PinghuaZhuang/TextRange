@@ -9,19 +9,19 @@ import {
   isPlainTextNode,
 } from './utils';
 
-interface RangeNodeData {
+export interface RangeNodeData {
   path: Path;
   offset: number;
   text: string;
 }
 
-interface RangeData {
+export interface RangeData {
   id: string | number;
   start: RangeNodeData;
   end: RangeNodeData;
 }
 
-interface TextRangeOptions {
+export interface TextRangeOptions {
   container?: Element;
   range?: Range;
   id?: string | number;
@@ -39,9 +39,9 @@ interface TextRangeOptions {
  *  对于 text(2) 的path为 [1, 0, 1]
  *  [(body > div + div), (div(1) > span), (span > text(0) + text(1))]
  */
-type Path = number[];
+export type Path = number[];
 
-type ID = string | number;
+export type ID = string | number;
 
 class TextRange {
   /**
