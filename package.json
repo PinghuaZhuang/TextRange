@@ -10,7 +10,7 @@
     "url": "https://github.com/PinghuaZhuang/TextRange"
   },
   "license": "MIT",
-  "author": "",
+  "author": "zphua2016@gmail.com",
   "type": "module",
   "main": "dist/index.min.js",
   "module": "es/index.js",
@@ -18,7 +18,8 @@
   "types": "./es",
   "files": [
     "es",
-    "dist"
+    "dist",
+    "example"
   ],
   "scripts": {
     "build": "tsc & rollup -c",
