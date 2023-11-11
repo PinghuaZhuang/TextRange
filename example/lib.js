@@ -124,6 +124,25 @@ function getRangeFrontierTextNode(target, offset) {
         ? target
         : getRangeFrontierTextNode(target.childNodes[offset], 0);
 }
+function findRectIncludePoint(rects, point, expand = 0) {
+    let expandX;
+    let expandY;
+    if (typeof expand === 'number') {
+        expandX = expandY = expand;
+    }
+    else {
+        [expandX, expandY] = expand;
+    }
+    let result;
+    rects.forEach((rect) => {
+        if (rect.x - expandX > point.x || rect.y - expandY > point.y)
+            return;
+        if (rect.right + expandX < point.x || rect.bottom + expandY < point.y)
+            return;
+        result = rect;
+    });
+    return result;
+}
 
 class TextRange {
     constructor(options = {}) {
@@ -324,24 +343,7 @@ class TextRange {
      * 判断坐标是否在 Range 内.
      */
     isPointInRange(point, expand = 0) {
-        let expandX;
-        let expandY;
-        if (typeof expand === 'number') {
-            expandX = expandY = expand;
-        }
-        else {
-            [expandX, expandY] = expand;
-        }
-        const mergeRects = this.mergeRects();
-        let result = false;
-        mergeRects.forEach((rect) => {
-            if (rect.x - expandX > point.x || rect.y - expandY > point.y)
-                return;
-            if (rect.right + expandX < point.x || rect.bottom + expandY < point.y)
-                return;
-            result = true;
-        });
-        return result;
+        return !!findRectIncludePoint(this.mergeRects(), point, expand);
     }
     /**
      * 判断 Range 是否在可视区域内

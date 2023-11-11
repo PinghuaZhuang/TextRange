@@ -168,3 +168,25 @@ export function getRangeFrontierTextNode(
     ? (target as Comment)
     : getRangeFrontierTextNode(target.childNodes[offset], 0);
 }
+
+export function findRectIncludePoint(
+  rects: DOMRect[],
+  point: { x: number; y: number },
+  expand: [number, number] | number = 0,
+) {
+  let expandX: number;
+  let expandY: number;
+  if (typeof expand === 'number') {
+    expandX = expandY = expand;
+  } else {
+    [expandX, expandY] = expand;
+  }
+  let result: DOMRect | undefined;
+  rects.forEach((rect) => {
+    if (rect.x - expandX > point.x || rect.y - expandY > point.y) return;
+    if (rect.right + expandX < point.x || rect.bottom + expandY < point.y)
+      return;
+    result = rect;
+  });
+  return result;
+}
