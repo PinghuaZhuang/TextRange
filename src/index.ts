@@ -4,7 +4,8 @@ import {
   getTextNodeRects,
   isSingle,
   getStartAndEndRangeText,
-  compareBoundaryRects,
+  isAdjacentV,
+  isAdjacentH,
   getRangeFrontierTextNode,
   isPlainTextNode,
 } from './utils';
@@ -141,10 +142,14 @@ class TextRange {
     let rect = rects[0];
     const mergeRects: DOMRect[] = [rect];
     rects.reduce((pre, cur) => {
-      if (compareBoundaryRects(pre, cur)) {
-        pre.width += cur.width;
+      if (isAdjacentH(pre, cur)) {
+        pre.width += Math.floor(cur.width);
         pre.height = Math.max(pre.height, cur.height);
         pre.y = Math.min(pre.y, cur.y);
+        return pre;
+      }
+      if (isAdjacentV(pre, cur)) {
+        pre.height += Math.floor(cur.height);
         return pre;
       }
       mergeRects.push(cur);

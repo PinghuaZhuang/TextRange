@@ -101,9 +101,16 @@ function isSingle(range) {
     return startContainer === endContainer;
 }
 /**
- * 判断2个DOMRect是否水平方向相邻
+ * 判断2个DOMRect是否垂直允许合并
  */
-function compareBoundaryRects(left, right) {
+function isAdjacentV(left, right) {
+    // 由于line-height, 这里有一些误差
+    return left.width === right.width && Math.abs(left.bottom - right.top) < 1;
+}
+/**
+ * 判断2个DOMRect是否水平方向允许合并
+ */
+function isAdjacentH(left, right) {
     return left.right === right.left;
 }
 /**
@@ -199,10 +206,14 @@ class TextRange {
         let rect = rects[0];
         const mergeRects = [rect];
         rects.reduce((pre, cur) => {
-            if (compareBoundaryRects(pre, cur)) {
-                pre.width += cur.width;
+            if (isAdjacentH(pre, cur)) {
+                pre.width += Math.floor(cur.width);
                 pre.height = Math.max(pre.height, cur.height);
                 pre.y = Math.min(pre.y, cur.y);
+                return pre;
+            }
+            if (isAdjacentV(pre, cur)) {
+                pre.height += Math.floor(cur.height);
                 return pre;
             }
             mergeRects.push(cur);
