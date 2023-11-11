@@ -312,7 +312,7 @@ class TextRange {
    * 根据配置创建 TextRange
    */
   static create(config: RangeData, root?: Element): TextRange {
-    const range = this.createRange(config, root);
+    const range = TextRange.createRange(config, root);
     return new TextRange({ id: config.id, range, container: root });
   }
 
