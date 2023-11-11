@@ -59,7 +59,7 @@ interface RangeData {
 /**
  * 距离根元素的距离
  * @example body > div(0) + div(1) > span > text(0) + text(1)
- *  对于 text(2) 的path为 [1, 0, 1]
+ *  对于 text(1) 的path为 [1, 0, 1]
  *  [(body > div + div), (div(1) > span), (span > text(0) + text(1))]
  */
 type Path = number[];
