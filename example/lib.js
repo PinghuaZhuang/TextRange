@@ -104,7 +104,7 @@ function isSingle(range) {
  * 判断2个DOMRect是否垂直允许合并
  */
 function isAdjacentV(left, right) {
-    // 由于line-height, 这里有一些误差
+    // 由于line-height, 这里高度有一些误差
     return left.width === right.width && Math.abs(left.bottom - right.top) < 1;
 }
 /**
@@ -218,7 +218,7 @@ class TextRange {
     /**
      * 水平方向相邻的 DOMRect 合并
      */
-    mergeRects() {
+    mergeRects(v) {
         const rects = this.rects();
         if (!rects.length)
             return [];
@@ -226,12 +226,12 @@ class TextRange {
         const mergeRects = [rect];
         rects.reduce((pre, cur) => {
             if (isAdjacentH(pre, cur)) {
-                pre.width += Math.floor(cur.width);
+                pre.width += cur.width;
                 pre.height = Math.max(pre.height, cur.height);
                 pre.y = Math.min(pre.y, cur.y);
                 return pre;
             }
-            if (isAdjacentV(pre, cur)) {
+            if (v && isAdjacentV(pre, cur)) {
                 pre.height += Math.floor(cur.height);
                 return pre;
             }

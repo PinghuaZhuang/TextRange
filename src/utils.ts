@@ -21,7 +21,7 @@ export function isPlainTextNode(node: Node): node is Text {
 }
 
 /**
- * 判断==是否选中了文本
+ * 判断是否选中了文本
  */
 export function isValidRange(selection: Selection) {
   if (selection.isCollapsed || selection.getRangeAt(0).collapsed) return false;
@@ -144,7 +144,7 @@ export function isSingle(range: Range) {
  * 判断2个DOMRect是否垂直允许合并
  */
 export function isAdjacentV(left: DOMRect, right: DOMRect) {
-  // 由于line-height, 这里有一些误差
+  // 由于line-height, 这里高度有一些误差
   return left.width === right.width && Math.abs(left.bottom - right.top) < 1;
 }
 /**

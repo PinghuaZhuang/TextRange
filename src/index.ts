@@ -137,19 +137,19 @@ class TextRange {
   /**
    * 水平方向相邻的 DOMRect 合并
    */
-  mergeRects() {
+  mergeRects(v?: boolean) {
     const rects = this.rects();
     if (!rects.length) return [];
     let rect = rects[0];
     const mergeRects: DOMRect[] = [rect];
     rects.reduce((pre, cur) => {
       if (isAdjacentH(pre, cur)) {
-        pre.width += Math.floor(cur.width);
+        pre.width += cur.width;
         pre.height = Math.max(pre.height, cur.height);
         pre.y = Math.min(pre.y, cur.y);
         return pre;
       }
-      if (isAdjacentV(pre, cur)) {
+      if (v && isAdjacentV(pre, cur)) {
         pre.height += Math.floor(cur.height);
         return pre;
       }
