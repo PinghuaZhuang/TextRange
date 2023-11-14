@@ -141,14 +141,14 @@ export function isSingle(range: Range) {
 }
 
 /**
- * 判断2个DOMRect是否垂直允许合并
+ * 判断2个DOMRect垂直方向是否允许合并
  */
 export function isAdjacentV(left: DOMRect, right: DOMRect) {
   // 由于line-height, 这里高度有一些误差
   return left.width === right.width && Math.abs(left.bottom - right.top) < 1;
 }
 /**
- * 判断2个DOMRect是否水平方向允许合并
+ * 判断2个DOMRect水平方向是否允许合并
  */
 export function isAdjacentH(left: DOMRect, right: DOMRect) {
   return left.right === right.left;
