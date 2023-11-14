@@ -90,6 +90,17 @@ class TextRange {
     return isSingle(this.range);
   }
 
+  get commonAncestorElement() {
+    const container = this.range.commonAncestorContainer;
+    return container instanceof Element
+      ? container.parentElement!
+      : container.parentElement!.parentElement!;
+  }
+
+  get isEmpty() {
+    return this.range.collapsed;
+  }
+
   text() {
     return this.range.toString();
   }
@@ -103,10 +114,6 @@ class TextRange {
     textNodes.shift();
     textNodes.pop();
     return textNodes;
-  }
-
-  get isEmpty() {
-    return this.range.collapsed;
   }
 
   rect() {
@@ -213,7 +220,7 @@ class TextRange {
    * 替换文本节点
    * 替换成新的节点后, range会发生变化
    */
-  replace(render: (textNode: Text) => Node | Element) {
+  replace(render: (textNode: Text) => Node | Element | void) {
     if (!this.options.splitText) this.splitText();
     const textNodes = this.textNodes();
     textNodes.forEach((o) => {
