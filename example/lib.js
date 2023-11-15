@@ -178,9 +178,7 @@ class TextRange {
     }
     get commonAncestorElement() {
         const container = this.range.commonAncestorContainer;
-        return container instanceof Element
-            ? container.parentElement
-            : container.parentElement.parentElement;
+        return container instanceof Element ? container : container.parentElement;
     }
     get isEmpty() {
         return this.range.collapsed;
@@ -310,6 +308,40 @@ class TextRange {
             else {
                 parentNode.appendChild(newNode);
             }
+        });
+        this.update();
+    }
+    replaceNodes(render) {
+        if (!this.options.splitText)
+            this.splitText();
+        const textNodes = this.textNodes();
+        const cns = [[textNodes[0]]];
+        textNodes.reduce((pre, cur) => {
+            if (pre.nextSibling === cur && cur.textContent.trim()) {
+                cns[cns.length - 1].push(cur);
+            }
+            else {
+              cur.textContent.trim() && cns.push([cur]);
+            }
+            return cur;
+        });
+        console.log('----', cns, textNodes);
+        cns.forEach((nodes) => {
+            if (!nodes.length)
+                return;
+            const { parentNode, nextSibling } = nodes[nodes.length - 1];
+            if (parentNode == null)
+                return;
+            const newNode = render(nodes);
+            if (newNode == null)
+                return;
+            if (nextSibling) {
+                parentNode.insertBefore(newNode, nextSibling);
+            }
+            else {
+                parentNode.appendChild(newNode);
+            }
+            newNode.normalize();
         });
         this.update();
     }

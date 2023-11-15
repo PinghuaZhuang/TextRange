@@ -123,7 +123,7 @@ nrmark {
 + isEmpty: boolean;
   + `range` 是否为空.
 
-## 实例方法
+## 方法
 
 + **rects**: () => DOMRect[];
   + `range.getClientRects()` 所有元素的非空 DOMRect.
@@ -142,6 +142,9 @@ nrmark {
   + 判断 `range` 是否在可视区域内.
   + threshold: 目标元素与视窗重叠的阈值（0~1）
 
++ replaceNodes: (render: (textNodes: Text[]) => Node | Element | void) => void;
+  + 如果是相邻的文本节点则合并到新节点中.
+  
 + text: () => string;
   + `range.toString()`.
 
