@@ -311,21 +311,24 @@ class TextRange {
         });
         this.update();
     }
+    /**
+     * 如果是相邻的文本节点则合并到新节点中
+     */
     replaceNodes(render) {
         if (!this.options.splitText)
             this.splitText();
         const textNodes = this.textNodes();
         const cns = [[textNodes[0]]];
         textNodes.reduce((pre, cur) => {
-            if (pre.nextSibling === cur && cur.textContent.trim()) {
+            var _a, _b;
+            if (pre.nextSibling === cur && ((_a = cur.textContent) === null || _a === void 0 ? void 0 : _a.trim())) {
                 cns[cns.length - 1].push(cur);
             }
             else {
-              cur.textContent.trim() && cns.push([cur]);
+                ((_b = cur.textContent) === null || _b === void 0 ? void 0 : _b.trim()) && cns.push([cur]);
             }
             return cur;
         });
-        console.log('----', cns, textNodes);
         cns.forEach((nodes) => {
             if (!nodes.length)
                 return;
@@ -343,7 +346,6 @@ class TextRange {
             }
             newNode.normalize();
         });
-        this.update();
     }
     /**
      * 更新 range
