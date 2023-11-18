@@ -21,6 +21,11 @@ export default [
     input: 'es/index.js',
     output: { file: './example/lib.js', format: 'es' },
   },
+  {
+    input: 'es/index.js',
+    output: { file: './es/index.min.js', format: 'es' },
+    plugins: [terser()],
+  },
   // browser-friendly UMD build
   {
     input: './es/index.js',
